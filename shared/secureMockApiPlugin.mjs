@@ -316,7 +316,12 @@ export function secureMockApiPlugin(options = {}) {
       sendJson(res, 403, { error: 'Missing authenticated session or admin token' });
       return;
     }
-    sendJson(res, 200, readJson(statePath(sid), {}));
+    const storedState = readJson(statePath(sid), null);
+    sendJson(res, 200, {
+      stored_state: storedState,
+      has_custom_state: storedState !== null,
+      sid: url.searchParams.get('sid') === PLACEHOLDER_SID ? PLACEHOLDER_SID : sid,
+    });
   }
 
   function handleGo(req, res, url) {
