@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { getSessionId, fetchCustomState, saveState, initializeData, initialKey, generateId } from '../utils/dataManager';
+import {
+  fetchCustomState,
+  generateId,
+  getSessionId,
+  initializeData,
+  initialKey,
+  saveState,
+  storageKey
+} from '../utils/dataManager';
 import { computeStateDiff } from '../utils/stateTracker';
 
 const AppContext = createContext(null);
@@ -17,7 +25,9 @@ export function AppProvider({ children }) {
 
     const sid = sidRef.current;
     const ik = initialKey(sid);
-    const isRefresh = localStorage.getItem(ik) !== null;
+    const isRefresh =
+      localStorage.getItem(ik) !== null &&
+      localStorage.getItem(storageKey(sid)) !== null;
 
     if (isRefresh) {
       const data = initializeData(sid);
@@ -162,7 +172,10 @@ export function AppProvider({ children }) {
       const restaurant = prev.restaurants.find(r => r.id === cart.restaurantId);
       const subtotal = cart.items.reduce((s, item) => s + item.totalPrice, 0);
       const serviceFee = Math.min(Math.max(subtotal * 0.15, 0.99), 9.99);
-      const deliveryFee = restaurant ? restaurant.deliveryFee : 0;
+      const deliveryFee =
+        cart.deliveryMode === 'pickup' || prev.user.uberOneActive
+          ? 0
+          : restaurant?.deliveryFee || 0;
       const tax = subtotal * 0.09;
       const tipAmount = cart.tipPercentage ? subtotal * (cart.tipPercentage / 100) : cart.tipAmount;
       const total = subtotal + serviceFee + deliveryFee + tax + tipAmount - cart.promoDiscount;
@@ -291,6 +304,79 @@ export function AppProvider({ children }) {
         orders: prev.orders.map(o =>
           o.id === orderId ? { ...o, rating, review: review || null } : o
         )
+      };
+    });
+  }, []);
+
+  const reorder = useCallback((orderId) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const order = prev.orders.find(candidate => candidate.id === orderId);
+      if (!order) return prev;
+
+      const restaurant = prev.restaurants.find(
+        candidate => candidate.id === order.restaurantId
+      );
+      const items = order.items.map(orderItem => {
+        const menuItem = prev.menuItems.find(
+          candidate => candidate.id === orderItem.menuItemId
+        );
+        const availableOptions = (menuItem?.customizationGroups || []).flatMap(
+          group =>
+            group.options.map(option => ({
+              ...option,
+              groupId: group.id,
+              groupName: group.name
+            }))
+        );
+        const selectedOptions = (orderItem.selectedOptions || []).map(optionName => {
+          const option = availableOptions.find(candidate => candidate.name === optionName);
+          return {
+            groupId: option?.groupId || '',
+            groupName: option?.groupName || '',
+            optionId: option?.id || '',
+            optionName,
+            priceModifier: option?.priceModifier || 0
+          };
+        });
+        const quantity = orderItem.quantity || 1;
+        const unitPrice = orderItem.unitPrice || menuItem?.price || 0;
+        const modifierTotal = selectedOptions.reduce(
+          (sum, option) => sum + option.priceModifier,
+          0
+        );
+        const basePrice = Math.max(0, unitPrice - modifierTotal);
+        return {
+          id: generateId(),
+          menuItemId: orderItem.menuItemId,
+          restaurantId: order.restaurantId,
+          name: orderItem.name || menuItem?.name || 'Menu item',
+          quantity,
+          basePrice,
+          selectedOptions,
+          specialInstructions: orderItem.specialInstructions || '',
+          totalPrice: orderItem.totalPrice || unitPrice * quantity
+        };
+      });
+
+      return {
+        ...prev,
+        cart: {
+          restaurantId: order.restaurantId,
+          restaurantName: order.restaurantName || restaurant?.name || '',
+          items,
+          deliveryMode: order.deliveryMode || prev.cart.deliveryMode,
+          scheduledTime: null,
+          promoCode: null,
+          promoDiscount: 0,
+          tipAmount: 0,
+          tipPercentage: 18,
+          deliveryInstructions: ''
+        },
+        ui: {
+          ...prev.ui,
+          deliveryMode: order.deliveryMode || prev.ui.deliveryMode
+        }
       };
     });
   }, []);
@@ -467,6 +553,7 @@ export function AppProvider({ children }) {
       updateFilters,
       setSearchQuery,
       rateOrder,
+      reorder,
       updateAddress,
       updateDefaultPayment,
       setTip,
