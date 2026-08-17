@@ -504,7 +504,6 @@ When an order is placed and tracked, statuses auto-progress on timers:
 | `rateOrder(orderId, rating, review)` | — | Sets `orders[i].rating` and `orders[i].review` |
 | `reorder(orderId)` | string | Rebuilds `cart` from the selected order |
 | `updateAddress(addressId)` | string | Sets `ui.selectedAddressId` |
-| `updateDefaultPayment(paymentId)` | string | Selects the default payment method |
 | `setTip(amount, percentage)` | — | Updates `cart.tipAmount` and `cart.tipPercentage` |
 | `applyPromoCode(code)` | string | Sets `cart.promoCode` and `cart.promoDiscount` (validates expiry + restaurant) |
 | `updateOrderStatus(orderId, status)` | — | Updates `orders[i].status`; sets `deliveredAt` if delivered |

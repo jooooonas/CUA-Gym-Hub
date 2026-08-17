@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Check, Clock, CreditCard, MapPin, Tag } from 'lucide-react';
+import { Check, CreditCard, MapPin, Tag } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { formatCurrency } from '../utils/dataManager';
 import './Checkout.css';
 
 const TIP_OPTIONS = [0, 15, 18, 20, 25];
-const DELIVERY_TIMES = ['ASAP', 'Today, 7:00 PM', 'Tomorrow, 12:30 PM'];
 
 export default function Checkout() {
   const {
@@ -20,7 +19,6 @@ export default function Checkout() {
   } = useApp();
   const navigate = useNavigate();
   const [openPicker, setOpenPicker] = useState(null);
-  const [deliveryTime, setDeliveryTime] = useState(DELIVERY_TIMES[0]);
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -35,10 +33,7 @@ export default function Checkout() {
   );
   const subtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
   const serviceFee = Math.min(Math.max(subtotal * 0.15, 0.99), 9.99);
-  const deliveryFee =
-    cart.deliveryMode === 'pickup' || state.user.uberOneActive
-      ? 0
-      : restaurant?.deliveryFee || 0;
+  const deliveryFee = restaurant ? restaurant.deliveryFee : 0;
   const tax = subtotal * 0.09;
   const tip = cart.tipPercentage
     ? subtotal * (cart.tipPercentage / 100)
@@ -89,7 +84,7 @@ export default function Checkout() {
       setOpenPicker('address');
       return;
     }
-    const orderId = placeOrder({ deliveryTime });
+    const orderId = placeOrder();
     navigate(`/orders/${orderId}`);
   };
 
@@ -142,40 +137,6 @@ export default function Checkout() {
                 </div>
               )}
               {addressError && <p className="checkout__address-error">{addressError}</p>}
-            </div>
-
-            <div className="checkout__card">
-              <div className="checkout__row">
-                <Clock size={20} />
-                <div className="checkout__row-content">
-                  <strong>{cart.deliveryMode === 'pickup' ? 'Pickup time' : 'Delivery time'}</strong>
-                  <span className="checkout__row-sub">{deliveryTime}</span>
-                </div>
-                <button
-                  className="checkout__edit-btn"
-                  onClick={() => setOpenPicker(openPicker === 'time' ? null : 'time')}
-                >
-                  Schedule
-                </button>
-              </div>
-              {openPicker === 'time' && (
-                <div className="checkout__picker">
-                  {DELIVERY_TIMES.map(option => (
-                    <button
-                      key={option}
-                      className={`checkout__picker-option ${option === deliveryTime ? 'checkout__picker-option--active' : ''}`}
-                      onClick={() => {
-                        setDeliveryTime(option);
-                        setOpenPicker(null);
-                      }}
-                    >
-                      <Clock size={16} />
-                      <span>{option}</span>
-                      {option === deliveryTime && <Check size={16} />}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             <label className="checkout__instructions-label" htmlFor="delivery-instructions">

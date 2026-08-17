@@ -1,13 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import {
-  fetchCustomState,
-  generateId,
-  getSessionId,
-  initializeData,
-  initialKey,
-  saveState,
-  storageKey
-} from '../utils/dataManager';
+import { getSessionId, fetchCustomState, saveState, initializeData, initialKey, generateId } from '../utils/dataManager';
 import { computeStateDiff } from '../utils/stateTracker';
 
 const AppContext = createContext(null);
@@ -25,9 +17,7 @@ export function AppProvider({ children }) {
 
     const sid = sidRef.current;
     const ik = initialKey(sid);
-    const isRefresh =
-      localStorage.getItem(ik) !== null &&
-      localStorage.getItem(storageKey(sid)) !== null;
+    const isRefresh = localStorage.getItem(ik) !== null;
 
     if (isRefresh) {
       const data = initializeData(sid);
@@ -164,7 +154,7 @@ export function AppProvider({ children }) {
     });
   }, []);
 
-  const placeOrder = useCallback((orderData) => {
+  const placeOrder = useCallback(() => {
     const orderId = 'ord_' + Date.now().toString(36);
     setState(prev => {
       if (!prev) return prev;
@@ -172,10 +162,7 @@ export function AppProvider({ children }) {
       const restaurant = prev.restaurants.find(r => r.id === cart.restaurantId);
       const subtotal = cart.items.reduce((s, item) => s + item.totalPrice, 0);
       const serviceFee = Math.min(Math.max(subtotal * 0.15, 0.99), 9.99);
-      const deliveryFee =
-        cart.deliveryMode === 'pickup' || prev.user.uberOneActive
-          ? 0
-          : restaurant?.deliveryFee || 0;
+      const deliveryFee = restaurant ? restaurant.deliveryFee : 0;
       const tax = subtotal * 0.09;
       const tipAmount = cart.tipPercentage ? subtotal * (cart.tipPercentage / 100) : cart.tipAmount;
       const total = subtotal + serviceFee + deliveryFee + tax + tipAmount - cart.promoDiscount;

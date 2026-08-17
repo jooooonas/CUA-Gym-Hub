@@ -146,7 +146,9 @@ export default defineConfig({
                 ? deepMerge(currentState, data.state)
                 : data.state
 
-              writeInitialState(sid, newState)
+              if (!readInitialState(sid)) {
+                writeInitialState(sid, currentState && Object.keys(currentState).length ? currentState : newState)
+              }
               writeState(sid, newState)
 
               res.setHeader('Content-Type', 'application/json')
@@ -261,7 +263,9 @@ export default defineConfig({
                 ? deepMerge(currentState, data.state)
                 : data.state
 
-              writeInitialState(sid, newState)
+              if (!readInitialState(sid)) {
+                writeInitialState(sid, currentState && Object.keys(currentState).length ? currentState : newState)
+              }
               writeState(sid, newState)
 
               res.setHeader('Content-Type', 'application/json')
