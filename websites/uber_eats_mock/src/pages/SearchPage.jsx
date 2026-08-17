@@ -6,7 +6,7 @@ import RestaurantCard from '../components/RestaurantCard';
 import './SearchPage.css';
 
 export default function SearchPage() {
-  const { state, clearRecentSearches, setSearchQuery } = useApp();
+  const { state, setSearchQuery } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryParam = searchParams.get('q') || '';
@@ -114,16 +114,7 @@ export default function SearchPage() {
           {/* Recent searches */}
           {state.ui.recentSearches && state.ui.recentSearches.length > 0 && (
             <section className="search-page__section">
-              <div className="search-page__section-header">
-                <h3 className="search-page__section-title">Recent searches</h3>
-                <button
-                  className="search-page__clear-recent"
-                  onClick={clearRecentSearches}
-                  type="button"
-                >
-                  Clear
-                </button>
-              </div>
+              <h3 className="search-page__section-title">Recent searches</h3>
               <div className="search-page__recent">
                 {state.ui.recentSearches.map((term, idx) => (
                   <button

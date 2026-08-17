@@ -26,15 +26,6 @@ export async function fetchCustomState(sid = null) {
     if (response.ok) {
       const data = await response.json();
       if (data.has_custom_state && data.stored_state) return data.stored_state;
-      if (
-        data &&
-        typeof data === 'object' &&
-        !Array.isArray(data) &&
-        !data.error &&
-        Object.keys(data).length > 0
-      ) {
-        return data;
-      }
     }
   } catch (e) {
     // No custom state available; use defaults
@@ -97,8 +88,7 @@ export function initializeData(sid = null, customState = null) {
     const merged = deepMerge(defaults, customState);
     localStorage.setItem(sk, JSON.stringify(merged));
     localStorage.setItem(ik, JSON.stringify(merged));
-    // Injected state already has a server-side baseline. The browser may only
-    // update current state in hardened mode, so do not try to set it again.
+    syncInitialState(merged, sid);
     return merged;
   }
 

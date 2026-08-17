@@ -110,27 +110,6 @@
   margin-bottom: 12px;
 }
 
-.search-page__section-header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.search-page__section-header .search-page__section-title {
-  margin-bottom: 0;
-}
-
-.search-page__clear-recent {
-  color: var(--color-gray-700);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-}
-
-.search-page__clear-recent:hover {
-  text-decoration: underline;
-}
-
 .search-page__recent {
   display: flex;
   flex-direction: column;

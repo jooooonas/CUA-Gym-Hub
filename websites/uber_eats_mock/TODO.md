@@ -64,7 +64,7 @@
   - State persists to `localStorage` under key `"uber_eats_state"`
   - On mount: check localStorage first, fall back to `createInitialData()`
   - Track `initialState` separately (deep clone at first load) for state diffing
-  - Provide these context actions: `addToCart`, `removeFromCart`, `updateCartItemQuantity`, `clearCart`, `placeOrder`, `toggleFavorite`, `setDeliveryMode`, `updateFilters`, `setSearchQuery`, `clearRecentSearches`, `rateOrder`, `reorder`, `updateAddress`, `setTip`, `applyPromoCode`
+  - Provide these context actions: `addToCart`, `removeFromCart`, `updateCartItemQuantity`, `clearCart`, `placeOrder`, `toggleFavorite`, `setDeliveryMode`, `updateFilters`, `setSearchQuery`, `rateOrder`, `reorder`, `updateAddress`, `setTip`, `applyPromoCode`
 
 - [x] **`/go` endpoint** (`src/pages/Go.jsx` + route):
   - Renders `<pre>` with JSON containing `{ initial_state, current_state, state_diff }`
