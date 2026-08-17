@@ -296,6 +296,16 @@ export function AppProvider({ children }) {
     });
   }, []);
 
+  const clearRecentSearches = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ui: { ...prev.ui, recentSearches: [] }
+      };
+    });
+  }, []);
+
   const rateOrder = useCallback((orderId, rating, review) => {
     setState(prev => {
       if (!prev) return prev;
@@ -552,6 +562,7 @@ export function AppProvider({ children }) {
       setDeliveryMode,
       updateFilters,
       setSearchQuery,
+      clearRecentSearches,
       rateOrder,
       reorder,
       updateAddress,

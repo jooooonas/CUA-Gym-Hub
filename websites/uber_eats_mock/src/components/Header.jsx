@@ -176,6 +176,13 @@ export default function Header({ onCartClick, onMenuClick }) {
                       onChange={(e) => setNewAddress(a => ({ ...a, zip: e.target.value }))}
                     />
                   </div>
+                  <input
+                    className="ue-header__add-address-input"
+                    type="text"
+                    placeholder="Delivery instructions (optional)"
+                    value={newAddress.instructions}
+                    onChange={(e) => setNewAddress(a => ({ ...a, instructions: e.target.value }))}
+                  />
                   <button
                     className="ue-header__add-address-save"
                     onClick={handleAddNewAddress}

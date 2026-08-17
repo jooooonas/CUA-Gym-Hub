@@ -465,6 +465,7 @@
 | Rate order | `orders[i].rating` set (1-5); `orders[i].review` set |
 | Toggle favorite restaurant | `user.favoriteRestaurantIds` array gains or loses the restaurant ID |
 | Search for restaurants | `ui.searchQuery` updated; `ui.recentSearches` may grow (max 5) |
+| Clear recent searches | `ui.recentSearches` becomes an empty array |
 | Update sort filter (including "popular") | `ui.activeFilters.sort` changed; `"popular"` sorts by `reviewCount` descending |
 | Toggle price range filter | `ui.activeFilters.priceRange` array updated |
 | Toggle dietary filter | `ui.activeFilters.dietary` array updated (values are lowercase-hyphen, e.g. `"gluten-free"`) |
@@ -499,8 +500,11 @@ When an order is placed and tracked, statuses auto-progress on timers:
 | `setDeliveryMode(mode)` | `"delivery"` or `"pickup"` | Updates `cart.deliveryMode` and `ui.deliveryMode` |
 | `updateFilters(filters)` | Partial filter object | Merges into `ui.activeFilters` |
 | `setSearchQuery(query)` | string | Updates `ui.searchQuery`; appends to `ui.recentSearches` |
+| `clearRecentSearches()` | — | Clears `ui.recentSearches` |
 | `rateOrder(orderId, rating, review)` | — | Sets `orders[i].rating` and `orders[i].review` |
+| `reorder(orderId)` | string | Rebuilds `cart` from the selected order |
 | `updateAddress(addressId)` | string | Sets `ui.selectedAddressId` |
+| `updateDefaultPayment(paymentId)` | string | Selects the default payment method |
 | `setTip(amount, percentage)` | — | Updates `cart.tipAmount` and `cart.tipPercentage` |
 | `applyPromoCode(code)` | string | Sets `cart.promoCode` and `cart.promoDiscount` (validates expiry + restaurant) |
 | `updateOrderStatus(orderId, status)` | — | Updates `orders[i].status`; sets `deliveredAt` if delivered |
