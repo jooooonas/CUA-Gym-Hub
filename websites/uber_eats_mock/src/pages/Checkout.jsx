@@ -20,8 +20,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [openPicker, setOpenPicker] = useState(null);
   const [promoInput, setPromoInput] = useState('');
-  const [promoError, setPromoError] = useState('');
-  const [addressError, setAddressError] = useState('');
 
   const { cart } = state;
   const restaurant = state.restaurants.find(item => item.id === cart.restaurantId);
@@ -50,40 +48,15 @@ export default function Checkout() {
     );
   }
 
-  const validatePromo = code => {
-    const promo = state.promotions.find(
-      candidate => candidate.code?.toLowerCase() === code.toLowerCase()
-    );
-    if (!promo) return 'Promo code not found.';
-    if (promo.expiresAt && new Date(`${promo.expiresAt}T23:59:59`) < new Date()) {
-      return 'This promo code has expired.';
-    }
-    if (promo.restaurantId && promo.restaurantId !== cart.restaurantId) {
-      return 'This promo code is not valid for this restaurant.';
-    }
-    if (subtotal < promo.minOrder) {
-      return `This promo requires a ${formatCurrency(promo.minOrder)} subtotal.`;
-    }
-    return '';
-  };
-
   const handlePromoSubmit = event => {
     event.preventDefault();
     const code = promoInput.trim();
-    const error = validatePromo(code);
-    setPromoError(error);
-    if (!error) {
-      applyPromoCode(code);
-      setPromoInput('');
-    }
+    if (!code) return;
+    applyPromoCode(code);
+    setPromoInput('');
   };
 
   const handlePlaceOrder = () => {
-    if (!selectedAddress) {
-      setAddressError('Select a delivery address before placing the order.');
-      setOpenPicker('address');
-      return;
-    }
     const orderId = placeOrder();
     navigate(`/orders/${orderId}`);
   };
@@ -122,7 +95,6 @@ export default function Checkout() {
                       className={`checkout__picker-option ${address.id === selectedAddress?.id ? 'checkout__picker-option--active' : ''}`}
                       onClick={() => {
                         updateAddress(address.id);
-                        setAddressError('');
                         setOpenPicker(null);
                       }}
                     >
@@ -136,7 +108,6 @@ export default function Checkout() {
                   ))}
                 </div>
               )}
-              {addressError && <p className="checkout__address-error">{addressError}</p>}
             </div>
 
             <label className="checkout__instructions-label" htmlFor="delivery-instructions">
@@ -224,7 +195,6 @@ export default function Checkout() {
                 <button className="checkout__promo-btn" type="submit">Apply</button>
               </form>
             )}
-            {promoError && <p className="checkout__promo-error">{promoError}</p>}
           </section>
 
           <section className="checkout__section">
