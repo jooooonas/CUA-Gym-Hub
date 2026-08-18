@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import CartPanel from './components/CartPanel';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -13,6 +13,14 @@ import Orders from './pages/Orders';
 import OrderTracking from './pages/OrderTracking';
 import SearchPage from './pages/SearchPage';
 import StorePage from './pages/StorePage';
+
+function LegacyRestaurantRedirect() {
+  const { id } = useParams();
+  const { search } = useLocation();
+
+  // CUA-Gym task ed102b55-60f0-558b-b76f-a29b0d199624 still launches /restaurant/rest_9.
+  return <Navigate to={{ pathname: `/store/${id}`, search }} replace />;
+}
 
 function AppRoutes() {
   const location = useLocation();
@@ -39,7 +47,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/store/:id" element={<StorePage />} />
-          <Route path="/restaurant/:id" element={<StorePage />} />
+          <Route path="/restaurant/:id" element={<LegacyRestaurantRedirect />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
