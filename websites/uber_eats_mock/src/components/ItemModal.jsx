@@ -50,7 +50,7 @@ export default function ItemModal({ item, onClose, onAdd }) {
       const selected = current.some(candidate => candidate.id === option.id);
       let next;
       if (group.maxSelections === 1) {
-        next = [option];
+        next = selected && group.minSelections === 0 ? [] : [option];
       } else if (selected) {
         next = current.filter(candidate => candidate.id !== option.id);
       } else if (current.length < group.maxSelections) {
@@ -117,7 +117,7 @@ export default function ItemModal({ item, onClose, onAdd }) {
                         checked={selected}
                         className="item-modal__option-input"
                         name={group.id}
-                        type={group.maxSelections === 1 ? 'radio' : 'checkbox'}
+                        type={group.maxSelections === 1 && group.minSelections > 0 ? 'radio' : 'checkbox'}
                         onChange={() => toggleOption(group, option)}
                       />
                       <span className="item-modal__option-name">{option.name}</span>
